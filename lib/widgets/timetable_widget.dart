@@ -78,12 +78,9 @@ class TimetableWidget extends StatelessWidget {
                 padding: EdgeInsets.all(3),
                 alignment: Alignment.center,
                 color: Colors.blue,
-                child: AutoSizeText(
-                  lesson.displayString(),
+                child: AutoSizeText.rich(
+                  lesson.displaySpan(),
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.white,
-                  ),
                   maxLines: 2,
                   overflowReplacement: Marquee(
                     text: lesson.displayString(),
