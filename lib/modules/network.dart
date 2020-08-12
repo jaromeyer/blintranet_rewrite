@@ -1,9 +1,9 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:blintranet/constants/headers.dart';
 import 'package:blintranet/models/exceptions.dart';
 import 'package:blintranet/models/week.dart';
+import 'package:blintranet/modules/date.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -40,15 +40,7 @@ class NetworkManager {
   }
 
   Future<Week> getWeek(int weekOffset) async {
-    final DateTime dateToday =
-        DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day)
-            .add(Duration(days: 7 * weekOffset));
-    DateTime startDate;
-    if (dateToday.weekday < 6) {
-      startDate = dateToday.subtract(Duration(days: dateToday.weekday - 1));
-    } else {
-      startDate = dateToday.add(Duration(days: 8 - dateToday.weekday));
-    }
+    DateTime startDate = Date.startDate(weekOffset);
     DateTime endDate = startDate.add(Duration(days: 4));
 
     final timetableResponse = await http.post(
@@ -62,7 +54,8 @@ class NetworkManager {
     );
 
     if (timetableResponse.statusCode == 200) {
-      return Week.fromJson(json.decode(timetableResponse.body));
+      Map<String, dynamic> decodedJson = json.decode(timetableResponse.body);
+      return Week.fromJson(decodedJson);
     } else if (timetableResponse.statusCode == 302) {
       throw InvalidSessionException();
     }

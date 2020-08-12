@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:blintranet/models/lesson.dart';
 import 'package:blintranet/models/week.dart';
 import 'package:marquee/marquee.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 class TimetableWidget extends StatelessWidget {
   final Week week;
@@ -14,18 +15,20 @@ class TimetableWidget extends StatelessWidget {
     List<TableRow> rows = [];
 
     // create title row
-    List<Widget> titleRow = [Container()];
+    List<TableCell> titleRow = [TableCell(child: Container())];
     Strings.weekDays.forEach((String weekDay) {
       titleRow.add(
         TableCell(
           child: Container(
             margin: EdgeInsets.all(1),
-            padding: EdgeInsets.all(4),
+            padding: EdgeInsets.all(3),
             color: Colors.indigoAccent,
             child: Text(
               weekDay,
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white, fontSize: 13),
+              style: TextStyle(
+                color: Colors.white,
+              ),
             ),
           ),
         ),
@@ -33,23 +36,30 @@ class TimetableWidget extends StatelessWidget {
     });
     rows.add(TableRow(children: titleRow));
 
+    // calculate cell height
+    double height = MediaQuery.of(context).size.height;
+    EdgeInsets padding = MediaQuery.of(context).padding;
+    double safeHeight =
+        height - padding.top - padding.bottom - kToolbarHeight - 48;
+    double cellHeight = (safeHeight / week.lessonRows.length) - 2;
+
     // create lesson rows
     week.lessonRows.forEach((String lessonTime, List<Lesson> lessons) {
-      List<Widget> lessonRow = [];
+      List<TableCell> lessonRow = [];
       lessonRow.add(
         TableCell(
           verticalAlignment: TableCellVerticalAlignment.fill,
           child: Container(
             margin: EdgeInsets.all(1),
-            padding: EdgeInsets.all(4),
+            padding: EdgeInsets.all(3),
             alignment: Alignment.center,
             color: Colors.indigo,
-            child: Text(
+            child: AutoSizeText(
               lessonTime,
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 13,
               ),
+              maxLines: 1,
             ),
           ),
         ),
@@ -58,49 +68,36 @@ class TimetableWidget extends StatelessWidget {
       lessons.forEach((Lesson lesson) {
         if (lesson == null) {
           // add empty spacer
-          lessonRow.add(Container());
+          lessonRow.add(TableCell(child: Container()));
         } else {
-          // add marquee instead of text if the string is longer than 50 chars
-          if (lesson.displayString().length > 50) {
-            lessonRow.add(
-              TableCell(
-                child: Container(
-                  height: 100,
-                  margin: EdgeInsets.all(1),
-                  padding: EdgeInsets.all(4),
-                  color: Colors.blue,
-                  child: Marquee(
+          lessonRow.add(
+            TableCell(
+              child: Container(
+                height: cellHeight,
+                margin: EdgeInsets.all(1),
+                padding: EdgeInsets.all(3),
+                alignment: Alignment.center,
+                color: Colors.blue,
+                child: AutoSizeText(
+                  lesson.displayString(),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white,
+                  ),
+                  maxLines: 2,
+                  overflowReplacement: Marquee(
                     text: lesson.displayString(),
                     blankSpace: 30.0,
-                    velocity: 30.0,
+                    velocity: 20.0,
                     scrollAxis: Axis.vertical,
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 13,
                     ),
                   ),
                 ),
               ),
-            );
-          } else {
-            lessonRow.add(
-              TableCell(
-                child: Container(
-                  margin: EdgeInsets.all(1),
-                  padding: EdgeInsets.all(4),
-                  color: Colors.blue,
-                  child: Text(
-                    lesson.displayString(),
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 13,
-                    ),
-                  ),
-                ),
-              ),
-            );
-          }
+            ),
+          );
         }
       });
       rows.add(TableRow(children: lessonRow));

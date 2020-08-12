@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:blintranet/models/exceptions.dart';
 import 'package:blintranet/models/week.dart';
+import 'package:blintranet/modules/date.dart';
 import 'package:blintranet/modules/network.dart';
 import 'package:blintranet/widgets/timetable_widget.dart';
 import 'package:flutter/material.dart';
@@ -13,13 +14,16 @@ class TimetableScreen extends StatefulWidget {
 
 class _TimetableScreenState extends State<TimetableScreen> {
   PageController _pageController;
+  PageView _pageView;
   NetworkManager _networkManager;
   bool _loggedIn = false;
+  String _title = "Blintranet";
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: 100);
+    _buildPageView();
     _networkManager = NetworkManager();
   }
 
@@ -29,6 +33,33 @@ class _TimetableScreenState extends State<TimetableScreen> {
     super.dispose();
   }
 
+  void _buildPageView() {
+    _pageView = PageView.builder(
+      controller: _pageController,
+      onPageChanged: (int index) {
+        int weekOffset = index - 100;
+        setState(() {
+          _title = Date.title(weekOffset);
+        });
+      },
+      itemBuilder: (context, index) {
+        int weekOffset = index - 100;
+        return FutureBuilder(
+          future: _buildTable(weekOffset),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return snapshot.data;
+            } else {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+          },
+        );
+      },
+    );
+  }
+
   Future<Widget> _buildTable(int weekOffset) async {
     try {
       // login
@@ -36,13 +67,15 @@ class _TimetableScreenState extends State<TimetableScreen> {
         await _networkManager.login();
         _loggedIn = true;
       }
-      return TimetableWidget(week: await _networkManager.getWeek(weekOffset));
+      Week week = await _networkManager.getWeek(weekOffset);
+      return TimetableWidget(week: week);
     } on InvalidCredentialsException {
       // open login screen
       Navigator.pushReplacementNamed(context, '/login');
     } on InvalidSessionException {
       // handle invalid session
       setState(() {
+        _buildPageView();
         _loggedIn = false;
       });
     } on IOException {
@@ -59,6 +92,7 @@ class _TimetableScreenState extends State<TimetableScreen> {
                 child: Text("Retry"),
                 onPressed: () {
                   setState(() {
+                    _buildPageView();
                     _loggedIn = false;
                   });
                   Navigator.pop(context);
@@ -68,8 +102,6 @@ class _TimetableScreenState extends State<TimetableScreen> {
           );
         },
       );
-    } catch (e) {
-      print(e);
     }
   }
 
@@ -77,7 +109,8 @@ class _TimetableScreenState extends State<TimetableScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Blintranet"),
+        elevation: 0.0,
+        title: Text(_title),
         actions: [
           IconButton(
             icon: Icon(Icons.mail),
@@ -97,24 +130,7 @@ class _TimetableScreenState extends State<TimetableScreen> {
           ),
         ],
       ),
-      body: PageView.builder(
-        controller: _pageController,
-        itemBuilder: (context, index) {
-          int weekOffset = index - 100;
-          return FutureBuilder(
-            future: _buildTable(weekOffset),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return snapshot.data;
-              } else {
-                return Center(
-                  child: CircularProgressIndicator(),
-                );
-              }
-            },
-          );
-        },
-      ),
+      body: _pageView,
     );
   }
 }
