@@ -16,8 +16,16 @@ class Lesson {
     _childLesson = childLesson;
   }
 
-  String displayString() {
+  String _titleString() {
     return _title + "  " + _roomName;
+  }
+
+  String displayString() {
+    if (_childLesson == null) {
+      return _titleString();
+    } else {
+      return _titleString() + "\n" + _childLesson._titleString();
+    }
   }
 
   Color _color() {
@@ -29,7 +37,7 @@ class Lesson {
       case LessonTypes.blockSubstitution:
       case LessonTypes.roomReservation:
       case LessonTypes.roomChange: // not sure
-        return Colors.blue;
+        return Color(0xFF0000FF);
       default:
         return Colors.white;
     }
@@ -37,13 +45,15 @@ class Lesson {
 
   TextSpan displaySpan() {
     return TextSpan(
-      text: displayString(),
-      style: TextStyle(
-          color: _color(),
-          decoration: _lessonType == LessonTypes.canceled
-              ? TextDecoration.lineThrough
-              : null),
       children: [
+        TextSpan(
+          text: _titleString(),
+          style: TextStyle(
+              color: _color(),
+              decoration: _lessonType == LessonTypes.canceled
+                  ? TextDecoration.lineThrough
+                  : null),
+        ),
         if (_childLesson != null) TextSpan(text: "\n"),
         if (_childLesson != null) _childLesson.displaySpan(),
       ],

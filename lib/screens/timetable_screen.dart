@@ -102,6 +102,8 @@ class _TimetableScreenState extends State<TimetableScreen> {
           );
         },
       );
+    } catch (e) {
+      print(e);
     }
   }
 

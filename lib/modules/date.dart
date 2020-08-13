@@ -19,11 +19,11 @@ class Date {
         DateFormat("dd.MM.yyyy").format(startDate(weekOffset));
 
     if (weekOffset > 0) {
-      return "$startDateString (+${weekOffset.toString()} week)";
+      return "$startDateString (+${weekOffset.toString()} wuche)";
     } else if (weekOffset < 0) {
-      return "$startDateString (${weekOffset.toString()} week)";
+      return "$startDateString (${weekOffset.toString()} wuche)";
     } else {
-      return "$startDateString (current week)";
+      return startDateString;
     }
   }
 }

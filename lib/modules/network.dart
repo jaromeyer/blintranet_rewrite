@@ -9,14 +9,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class NetworkManager {
   String _cookie;
+  String _studentId;
+  String _school;
 
   Future<void> login() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final String name = prefs.getString('name');
     final String password = prefs.getString('password');
-    final String school = prefs.getString('school');
+    _school = prefs.getString('school');
 
-    if (name == null || password == null || school == null) {
+    if (name == null || password == null || _school == null) {
       throw InvalidCredentialsException();
     }
 
@@ -25,7 +27,7 @@ class NetworkManager {
       body: {
         'loginuser': name,
         'loginpassword': password,
-        'loginschool': school
+        'loginschool': _school,
       },
       headers: Headers.loginHeaders,
     );
@@ -34,9 +36,35 @@ class NetworkManager {
     if (loginResponse.statusCode == 302) {
       final String rawCookie = loginResponse.headers['set-cookie'];
       _cookie = RegExp(r'sturmsession.*?;').firstMatch(rawCookie).group(0);
+      _studentId = await _getStudentId(await _getCsrfToken());
     } else if (loginResponse.statusCode == 200) {
       throw InvalidCredentialsException();
     }
+  }
+
+  Future<String> _getCsrfToken() async {
+    final csrfTokenResponse = await http.get(
+      'https://intranet.tam.ch/$_school',
+      headers: Headers.timetableHeaders(_cookie),
+    );
+    String csrfToken = RegExp(r".*csrfToken='(.*?)'")
+        .firstMatch(csrfTokenResponse.body)
+        .group(1);
+    return csrfToken;
+  }
+
+  Future<String> _getStudentId(String csrfToken) async {
+    final studentIdResponse = await http.post(
+      'https://intranet.tam.ch/$_school/timetable/ajax-get-resources',
+      body: {
+        'periodId': "72",
+        'csrfToken': csrfToken,
+      },
+      headers: Headers.resourcesHeaders(_cookie),
+    );
+    return json
+        .decode(studentIdResponse.body)['data']['students'][0]['personId']
+        .toString();
   }
 
   Future<Week> getWeek(int weekOffset) async {
@@ -44,11 +72,11 @@ class NetworkManager {
     DateTime endDate = startDate.add(Duration(days: 4));
 
     final timetableResponse = await http.post(
-      'https://intranet.tam.ch/kfr/timetable/ajax-get-timetable',
+      'https://intranet.tam.ch/$_school/timetable/ajax-get-timetable',
       body: {
         'startDate': startDate.millisecondsSinceEpoch.toString(),
         'endDate': endDate.millisecondsSinceEpoch.toString(),
-        'studentId[]': '4008876'
+        'studentId[]': _studentId,
       },
       headers: Headers.timetableHeaders(_cookie),
     );
