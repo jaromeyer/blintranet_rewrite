@@ -24,7 +24,7 @@ class Lesson {
     if (_childLesson == null) {
       return _titleString();
     } else {
-      return _titleString() + "\n" + _childLesson._titleString();
+      return _titleString() + "\n\n" + _childLesson._titleString();
     }
   }
 
@@ -47,7 +47,7 @@ class Lesson {
     if (_lessonType == LessonTypes.roomChange) {
       textSpans.add(
         TextSpan(
-          text: "$_title  ",
+          text: _title + "  ",
           style: TextStyle(color: Colors.white),
           children: [
             TextSpan(
