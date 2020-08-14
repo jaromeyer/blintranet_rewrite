@@ -83,12 +83,11 @@ class _TimetableScreenState extends State<TimetableScreen> {
         context: context,
         builder: (_) {
           return AlertDialog(
-            title: Text("No Internet Connection"),
-            content:
-                Text("Make sure your device is connected to the internet."),
+            title: Text("Kei Internet Verbindig"),
+            content: Text("Glaub meh musi nöd sege..."),
             actions: <Widget>[
               FlatButton(
-                child: Text("Retry"),
+                child: Text("OK"),
                 onPressed: () {
                   Navigator.pop(context);
                 },
@@ -104,11 +103,11 @@ class _TimetableScreenState extends State<TimetableScreen> {
         context: context,
         builder: (_) {
           return AlertDialog(
-            title: Text("Unknown error"),
+            title: Text("Kei ahnig was grad passiert isch"),
             content: Text(e.toString()),
             actions: <Widget>[
               FlatButton(
-                child: Text("Retry"),
+                child: Text("OK"),
                 onPressed: () {
                   setState(() {
                     _loggedIn = false;
