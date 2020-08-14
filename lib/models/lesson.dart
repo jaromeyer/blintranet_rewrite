@@ -21,10 +21,16 @@ class Lesson {
   }
 
   String displayString() {
-    if (_childLesson == null) {
-      return _titleString();
+    String displayString;
+    if (_lessonType == LessonTypes.canceled) {
+      displayString = "(${_titleString()})";
     } else {
-      return _titleString() + "\n\n" + _childLesson._titleString();
+      displayString = _titleString();
+    }
+    if (_childLesson == null) {
+      return displayString;
+    } else {
+      return displayString + "\n\n" + _childLesson._titleString();
     }
   }
 
