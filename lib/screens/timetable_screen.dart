@@ -138,14 +138,6 @@ class _TimetableScreenState extends State<TimetableScreen> {
             },
           ),
           IconButton(
-            icon: Icon(Icons.refresh),
-            onPressed: () {
-              setState(() {
-                _buildPageView();
-              });
-            },
-          ),
-          IconButton(
             icon: Icon(Icons.home),
             onPressed: () {
               _pageController.animateToPage(
@@ -158,6 +150,14 @@ class _TimetableScreenState extends State<TimetableScreen> {
         ],
       ),
       body: _pageView,
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.refresh),
+        onPressed: () {
+          setState(() {
+            _buildPageView();
+          });
+        },
+      ),
     );
   }
 }

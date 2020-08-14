@@ -31,7 +31,7 @@ class Lesson {
   Color _color() {
     switch (_lessonType) {
       case LessonTypes.canceled:
-        return Colors.red;
+        return Color(0xFFFF0000);
       case LessonTypes.shifted:
       case LessonTypes.added:
       case LessonTypes.blockSubstitution:
@@ -48,6 +48,7 @@ class Lesson {
       textSpans.add(
         TextSpan(
           text: "$_title  ",
+          style: TextStyle(color: Colors.white),
           children: [
             TextSpan(
               text: _roomName,

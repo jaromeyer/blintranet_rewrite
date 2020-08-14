@@ -1,60 +1,104 @@
+import 'package:blintranet/constants/strings.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class LoginScreen extends StatelessWidget {
-  Future<void> _saveCredentials(
-      String name, String password, String school) async {
+class LoginScreen extends StatefulWidget {
+  @override
+  _LoginScreenState createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  String _school;
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  Future<void> _saveCredentials() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('name', name);
-    prefs.setString('password', password);
-    prefs.setString('school', school);
+    prefs.setString('name', _nameController.text);
+    prefs.setString('password', _passwordController.text);
+    prefs.setString('school', _school);
+    Navigator.pushReplacementNamed(context, '/');
   }
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController nameController = TextEditingController();
-    final TextEditingController passwordController = TextEditingController();
-    final TextEditingController schoolController = TextEditingController();
-
     return Scaffold(
       appBar: AppBar(
         title: Text('Login'),
       ),
-      body: Column(
-        children: <Widget>[
-          TextField(
-            controller: schoolController,
-            autocorrect: false,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              labelText: 'school',
+      body: Card(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(10),
+              child: DropdownButtonFormField(
+                hint: Text("Schuel uswähle"),
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                ),
+                isExpanded: true,
+                items: Strings.schoolNames.entries.map((MapEntry entry) {
+                  return DropdownMenuItem<String>(
+                    value: entry.key,
+                    child: Text(entry.value),
+                  );
+                }).toList(),
+                onChanged: (String school) {
+                  setState(() {
+                    _school = school;
+                  });
+                },
+              ),
             ),
-          ),
-          TextField(
-            controller: nameController,
-            autocorrect: false,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              labelText: 'name',
+            Padding(
+              padding: EdgeInsets.all(10),
+              child: TextFormField(
+                controller: _nameController,
+                autocorrect: false,
+                textInputAction: TextInputAction.next,
+                onFieldSubmitted: (_) => FocusScope.of(context).nextFocus(),
+                decoration: InputDecoration(
+                  suffixIcon: Icon(Icons.person),
+                  border: OutlineInputBorder(),
+                  labelText: 'Name',
+                ),
+              ),
             ),
-          ),
-          TextField(
-            controller: passwordController,
-            obscureText: true,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              labelText: 'password',
+            Padding(
+              padding: EdgeInsets.all(10),
+              child: TextFormField(
+                controller: _passwordController,
+                obscureText: true,
+                onFieldSubmitted: (_) => _saveCredentials(),
+                decoration: InputDecoration(
+                  suffixIcon: Icon(Icons.lock_outline),
+                  border: OutlineInputBorder(),
+                  labelText: 'Passwort',
+                ),
+              ),
             ),
-          ),
-          RaisedButton(
-            child: Text('login'),
-            onPressed: () {
-              _saveCredentials(nameController.text, passwordController.text,
-                  schoolController.text);
-              Navigator.pushReplacementNamed(context, '/');
-            },
-          ),
-        ],
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 30, horizontal: 10),
+              child: FlatButton(
+                padding: EdgeInsets.all(16),
+                color: Colors.blue,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  'Login',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                  ),
+                ),
+                onPressed: () => _saveCredentials(),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
