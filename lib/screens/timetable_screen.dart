@@ -70,17 +70,16 @@ class _TimetableScreenState extends State<TimetableScreen> {
       Week week = await _networkManager.getWeek(weekOffset);
       return TimetableWidget(week: week);
     } on InvalidCredentialsException {
-      // open login screen
       Navigator.pushReplacementNamed(context, '/login');
     } on InvalidSessionException {
-      // handle invalid session
-      setState(() {
-        _buildPageView();
-        _loggedIn = false;
-      });
+      _loggedIn = false;
+      return _buildTable(weekOffset);
+    } on FormatException {
+      _loggedIn = false;
+      return _buildTable(weekOffset);
     } on IOException {
       // handle no internet
-      showDialog(
+      await showDialog(
         context: context,
         builder: (_) {
           return AlertDialog(
@@ -91,9 +90,29 @@ class _TimetableScreenState extends State<TimetableScreen> {
               FlatButton(
                 child: Text("Retry"),
                 onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        },
+      );
+      _loggedIn = false;
+      return _buildTable(weekOffset);
+    } catch (e) {
+      await showDialog(
+        context: context,
+        builder: (_) {
+          return AlertDialog(
+            title: Text("Unknown error"),
+            content: Text(e.toString()),
+            actions: <Widget>[
+              FlatButton(
+                child: Text("Retry"),
+                onPressed: () {
                   setState(() {
-                    _buildPageView();
                     _loggedIn = false;
+                    _buildPageView();
                   });
                   Navigator.pop(context);
                 },
@@ -102,8 +121,6 @@ class _TimetableScreenState extends State<TimetableScreen> {
           );
         },
       );
-    } catch (e) {
-      print(e);
     }
   }
 
@@ -118,6 +135,14 @@ class _TimetableScreenState extends State<TimetableScreen> {
             icon: Icon(Icons.mail),
             onPressed: () {
               Navigator.pushNamed(context, '/mail');
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.refresh),
+            onPressed: () {
+              setState(() {
+                _buildPageView();
+              });
             },
           ),
           IconButton(

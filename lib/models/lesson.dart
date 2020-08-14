@@ -36,7 +36,6 @@ class Lesson {
       case LessonTypes.added:
       case LessonTypes.blockSubstitution:
       case LessonTypes.roomReservation:
-      case LessonTypes.roomChange: // not sure
         return Color(0xFF0000FF);
       default:
         return Colors.white;
@@ -44,8 +43,21 @@ class Lesson {
   }
 
   TextSpan displaySpan() {
-    return TextSpan(
-      children: [
+    List<TextSpan> textSpans = [];
+    if (_lessonType == LessonTypes.roomChange) {
+      textSpans.add(
+        TextSpan(
+          text: "$_title  ",
+          children: [
+            TextSpan(
+              text: _roomName,
+              style: TextStyle(color: Color(0xFF0000FF)),
+            ),
+          ],
+        ),
+      );
+    } else {
+      textSpans.add(
         TextSpan(
           text: _titleString(),
           style: TextStyle(
@@ -54,9 +66,20 @@ class Lesson {
                   ? TextDecoration.lineThrough
                   : null),
         ),
-        if (_childLesson != null) TextSpan(text: "\n"),
-        if (_childLesson != null) _childLesson.displaySpan(),
-      ],
+      );
+    }
+    if (_childLesson != null) {
+      textSpans.add(
+        TextSpan(
+          text: "\n",
+          children: [
+            _childLesson.displaySpan(),
+          ],
+        ),
+      );
+    }
+    return TextSpan(
+      children: textSpans,
     );
   }
 }
