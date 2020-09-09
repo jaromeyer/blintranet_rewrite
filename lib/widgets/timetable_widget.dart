@@ -1,9 +1,9 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:blintranet/constants/strings.dart';
-import 'package:flutter/material.dart';
 import 'package:blintranet/models/lesson.dart';
 import 'package:blintranet/models/week.dart';
+import 'package:flutter/material.dart';
 import 'package:marquee/marquee.dart';
-import 'package:auto_size_text/auto_size_text.dart';
 
 class TimetableWidget extends StatelessWidget {
   final Week week;
