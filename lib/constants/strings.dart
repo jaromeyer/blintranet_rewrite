@@ -4,7 +4,7 @@ class Strings {
     'kme': "Kantonale Maturitätsschule für Erwachsene",
     'kbw': "Kantonsschule Büelrain",
     'ken': "Kantonsschule Enge",
-    'kfr': "Kantonsschule Freudenberg",
+    'kfr': "Kantonsschule Freudenberg/Liceo",
     'khp': "Kantonsschule Hohe Promenade",
     'ksh': "Kantonsschule Hottingen",
     'klw': "Kantonsschule Im Lee",
