@@ -23,7 +23,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     NetworkManager networkManager = new NetworkManager();
     try {
-      networkManager.login();
+      await networkManager.login();
       Navigator.pushReplacementNamed(context, '/');
     } on InvalidCredentialsException {
       print("invalid credentials");
@@ -36,79 +36,79 @@ class _LoginScreenState extends State<LoginScreen> {
       appBar: AppBar(
         title: Text('Login'),
       ),
-      body: Card(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Padding(
-              padding: EdgeInsets.fromLTRB(10, 30, 10, 10),
-              child: DropdownButtonFormField(
-                hint: Text("Schuel uswähle"),
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                ),
-                isExpanded: true,
-                items: Strings.schoolNames.entries.map((MapEntry entry) {
-                  return DropdownMenuItem<String>(
-                    value: entry.key,
-                    child: Text(entry.value),
-                  );
-                }).toList(),
-                onChanged: (String school) {
-                  setState(() {
-                    _school = school;
-                  });
-                },
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Padding(
+            padding: EdgeInsets.all(10.0),
+            child: DropdownButtonFormField(
+              hint: Text("Schuel uswähle"),
+              decoration: InputDecoration(
+                contentPadding: EdgeInsets.all(10.0),
+                border: OutlineInputBorder(),
+              ),
+              isExpanded: true,
+              items: Strings.schoolNames.entries.map((MapEntry entry) {
+                return DropdownMenuItem<String>(
+                  value: entry.key,
+                  child: Text(entry.value),
+                );
+              }).toList(),
+              onChanged: (String school) {
+                setState(() {
+                  _school = school;
+                });
+              },
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.all(10.0),
+            child: TextFormField(
+              controller: _nameController,
+              autocorrect: false,
+              textInputAction: TextInputAction.next,
+              onEditingComplete: () => FocusScope.of(context).nextFocus(),
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                contentPadding: EdgeInsets.all(10.0),
+                suffixIcon: Icon(Icons.person),
+                labelText: 'Name',
               ),
             ),
-            Padding(
-              padding: EdgeInsets.all(10),
-              child: TextFormField(
-                controller: _nameController,
-                autocorrect: false,
-                textInputAction: TextInputAction.next,
-                onFieldSubmitted: (_) => FocusScope.of(context).nextFocus(),
-                decoration: InputDecoration(
-                  suffixIcon: Icon(Icons.person),
-                  border: OutlineInputBorder(),
-                  labelText: 'Name',
-                ),
+          ),
+          Padding(
+            padding: EdgeInsets.all(10.0),
+            child: TextFormField(
+              controller: _passwordController,
+              obscureText: true,
+              onFieldSubmitted: (_) => _saveCredentials(),
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                contentPadding: EdgeInsets.all(10.0),
+                suffixIcon: Icon(Icons.lock_outline),
+                labelText: 'Passwort',
               ),
             ),
-            Padding(
-              padding: EdgeInsets.all(10),
-              child: TextFormField(
-                controller: _passwordController,
-                obscureText: true,
-                onFieldSubmitted: (_) => _saveCredentials(),
-                decoration: InputDecoration(
-                  suffixIcon: Icon(Icons.lock_outline),
-                  border: OutlineInputBorder(),
-                  labelText: 'Passwort',
+          ),
+          Padding(
+            padding: EdgeInsets.all(10.0),
+            child: FlatButton(
+              padding: EdgeInsets.all(14),
+              color: CustomColors.red,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Text(
+                'Login',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
                 ),
               ),
+              onPressed: () => _saveCredentials(),
             ),
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 30, horizontal: 10),
-              child: FlatButton(
-                padding: EdgeInsets.all(16),
-                color: CustomColors.red,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  'Login',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                  ),
-                ),
-                onPressed: () => _saveCredentials(),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

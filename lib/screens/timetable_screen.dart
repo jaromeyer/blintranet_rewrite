@@ -23,7 +23,8 @@ class _TimetableScreenState extends State<TimetableScreen> {
   @override
   void initState() {
     super.initState();
-    _pageController = new PageController(initialPage: 100);
+    _pageController =
+        new PageController(initialPage: 100, viewportFraction: 0.999);
     _pageView = _buildPageView();
     _networkManager = new NetworkManager();
   }
@@ -69,7 +70,7 @@ class _TimetableScreenState extends State<TimetableScreen> {
       await _showErrorDialog(
           "Da gits nüt meh zgseh🚫",
           "Stundeplän fürs nöchschte Semester sind leider nonig verfüegbar",
-          "Back To Safety");
+          "Ok");
       _navigateToWeekOffset(weekOffset - 1);
     } on IOException {
       // show error message and retry after user confirmation

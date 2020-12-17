@@ -23,9 +23,9 @@ class MyApp extends StatelessWidget {
       },
       title: "Blintranet",
       theme: ThemeData(
-        accentColor: CustomColors.red,
         primaryColor: CustomColors.blue,
-        primarySwatch: Colors.grey,
+        accentColor: CustomColors.red,
+        primarySwatch: CustomColors.red,
         canvasColor: Colors.white,
         appBarTheme: AppBarTheme(
           brightness: Brightness.light,
