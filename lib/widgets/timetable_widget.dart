@@ -1,4 +1,3 @@
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:blintranet/constants/strings.dart';
 import 'package:blintranet/models/day.dart';
 import 'package:blintranet/models/week.dart';
@@ -41,12 +40,8 @@ class TimetableWidget extends StatelessWidget {
     slots.add(
       TableCell(
         child: Container(
-          padding: EdgeInsets.symmetric(vertical: 2.0),
-          child: AutoSizeText(
-            lessonTime,
-            textAlign: TextAlign.center,
-            maxLines: 1,
-          ),
+          padding: EdgeInsets.only(top: 2.0, left: 2.0),
+          child: Text(lessonTime, textAlign: TextAlign.center),
         ),
       ),
     );
@@ -58,7 +53,7 @@ class TimetableWidget extends StatelessWidget {
           TableCell(
             child: Container(
               height: cellHeight,
-              padding: EdgeInsets.all(2),
+              padding: EdgeInsets.all(2.0),
               child: LessonSlotTile(day.lessonSlots[lessonTime]),
             ),
           ),

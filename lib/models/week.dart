@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'package:intl/intl.dart';
 
 import 'day.dart';
+import 'exceptions.dart';
 
 class Week {
   final List<Day> days = [
@@ -16,6 +17,7 @@ class Week {
   final Set<String> lessonTimes = new SplayTreeSet<String>();
 
   Week.fromJson(Map<String, dynamic> json) {
+    if (json['status'] == 0) throw new InvalidWeekException();
     // iterate over lessons
     for (Map<String, dynamic> jsonLesson in json['data']) {
       // add lesson time

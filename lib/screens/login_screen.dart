@@ -1,4 +1,7 @@
+import 'package:blintranet/constants/custom_colors.dart';
 import 'package:blintranet/constants/strings.dart';
+import 'package:blintranet/models/exceptions.dart';
+import 'package:blintranet/modules/network.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -17,7 +20,14 @@ class _LoginScreenState extends State<LoginScreen> {
     prefs.setString('name', _nameController.text);
     prefs.setString('password', _passwordController.text);
     prefs.setString('school', _school);
-    Navigator.pushReplacementNamed(context, '/');
+
+    NetworkManager networkManager = new NetworkManager();
+    try {
+      networkManager.login();
+      Navigator.pushReplacementNamed(context, '/');
+    } on InvalidCredentialsException {
+      print("invalid credentials");
+    }
   }
 
   @override
@@ -32,7 +42,7 @@ class _LoginScreenState extends State<LoginScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             Padding(
-              padding: EdgeInsets.all(10),
+              padding: EdgeInsets.fromLTRB(10, 30, 10, 10),
               child: DropdownButtonFormField(
                 hint: Text("Schuel uswähle"),
                 decoration: InputDecoration(
@@ -83,7 +93,7 @@ class _LoginScreenState extends State<LoginScreen> {
               padding: EdgeInsets.symmetric(vertical: 30, horizontal: 10),
               child: FlatButton(
                 padding: EdgeInsets.all(16),
-                color: Colors.blue,
+                color: CustomColors.red,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(6),
                 ),

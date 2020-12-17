@@ -25,6 +25,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         accentColor: CustomColors.red,
         primaryColor: CustomColors.blue,
+        primarySwatch: Colors.grey,
         canvasColor: Colors.white,
         appBarTheme: AppBarTheme(
           brightness: Brightness.light,
@@ -32,15 +33,15 @@ class MyApp extends StatelessWidget {
           elevation: 0.0,
           iconTheme: IconThemeData(color: CustomColors.red),
         ),
-        textTheme: TextTheme(
-          bodyText2: TextStyle(
-            color: CustomColors.textBlue,
-          ),
-        ),
         primaryTextTheme: TextTheme(
           headline6: TextStyle(
             color: CustomColors.textBlue,
             fontWeight: FontWeight.bold,
+          ),
+        ),
+        textTheme: TextTheme(
+          bodyText2: TextStyle(
+            color: CustomColors.textBlue,
           ),
         ),
       ),

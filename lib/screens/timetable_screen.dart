@@ -16,17 +16,16 @@ class TimetableScreen extends StatefulWidget {
 
 class _TimetableScreenState extends State<TimetableScreen> {
   PageController _pageController;
-  PageView _pageView;
   NetworkManager _networkManager;
-  bool _loggedIn = false;
+  PageView _pageView;
   String _title = "Blintranet";
 
   @override
   void initState() {
     super.initState();
-    _pageController = PageController(initialPage: 100);
-    _buildPageView();
-    _networkManager = NetworkManager();
+    _pageController = new PageController(initialPage: 100);
+    _pageView = _buildPageView();
+    _networkManager = new NetworkManager();
   }
 
   @override
@@ -35,27 +34,24 @@ class _TimetableScreenState extends State<TimetableScreen> {
     super.dispose();
   }
 
-  void _buildPageView() {
-    _pageView = PageView.builder(
+  PageView _buildPageView() {
+    return PageView.builder(
       controller: _pageController,
       onPageChanged: (int index) {
         int weekOffset = index - 100;
-        setState(() {
-          _title = Date.title(weekOffset);
-        });
+        setState(() => _title = Date.title(weekOffset));
       },
       itemBuilder: (context, index) {
         int weekOffset = index - 100;
         return FutureBuilder(
           future: _buildTable(weekOffset),
           builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return snapshot.data;
-            } else {
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-            }
+            return AnimatedSwitcher(
+              duration: Duration(milliseconds: 500),
+              child: snapshot.hasData
+                  ? snapshot.data
+                  : Center(child: CircularProgressIndicator()),
+            );
           },
         );
       },
@@ -64,66 +60,58 @@ class _TimetableScreenState extends State<TimetableScreen> {
 
   Future<Widget> _buildTable(int weekOffset) async {
     try {
-      // login
-      if (!_loggedIn) {
-        await _networkManager.login();
-        _loggedIn = true;
-      }
       Week week = await _networkManager.getWeek(weekOffset);
       return TimetableWidget(week);
     } on InvalidCredentialsException {
       Navigator.pushReplacementNamed(context, '/login');
-    } on InvalidSessionException {
-      _loggedIn = false;
-      return _buildTable(weekOffset);
-    } on FormatException {
-      _loggedIn = false;
-      return _buildTable(weekOffset);
+    } on InvalidWeekException {
+      // show error message and navigate back to valid week after user confirmation
+      await _showErrorDialog(
+          "Da gits nüt meh zgseh🚫",
+          "Stundeplän fürs nöchschte Semester sind leider nonig verfüegbar",
+          "Back To Safety");
+      _navigateToWeekOffset(weekOffset - 1);
     } on IOException {
-      // handle no internet
-      await showDialog(
-        context: context,
-        builder: (_) {
-          return CupertinoAlertDialog(
-            title: Text("Kei Internet Verbindig"),
-            content: Text("Glaub meh musi nöd sege..."),
-            actions: <Widget>[
-              CupertinoDialogAction(
-                isDefaultAction: true,
-                child: Text("OK"),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          );
-        },
-      );
-      _loggedIn = false;
+      // show error message and retry after user confirmation
+      await _showErrorDialog(
+          "Kei Internet📶", "Meh musi glaubs nöd sege", "Retry");
       return _buildTable(weekOffset);
     } catch (e) {
-      await showDialog(
-        context: context,
-        builder: (_) {
-          return AlertDialog(
-            title: Text("Kei ahnig was grad passiert isch😕"),
-            content: Text(e.toString()),
-            actions: <Widget>[
-              FlatButton(
-                child: Text("OK"),
-                onPressed: () {
-                  setState(() {
-                    _loggedIn = false;
-                    _buildPageView();
-                  });
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          );
-        },
-      );
+      // print and show stacktrace and retry after user interaction
+      await _showErrorDialog(
+          "Woops... Kei ahnig was grad passiert isch🙈", e, "Retry");
+      return _buildTable(weekOffset);
     }
+  }
+
+  Future<void> _showErrorDialog(
+      String title, String message, String button) async {
+    await showDialog(
+      context: context,
+      builder: (_) {
+        return CupertinoAlertDialog(
+          title: Text(title),
+          content: Text(message),
+          actions: <Widget>[
+            CupertinoDialogAction(
+              isDefaultAction: true,
+              child: Text(button),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _navigateToWeekOffset(int weekOffset) {
+    _pageController.animateToPage(
+      100 + weekOffset,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+    );
   }
 
   @override
@@ -144,13 +132,7 @@ class _TimetableScreenState extends State<TimetableScreen> {
       ),
       body: _pageView,
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _pageController.animateToPage(
-            100,
-            duration: const Duration(milliseconds: 500),
-            curve: Curves.easeInOut,
-          );
-        },
+        onPressed: () => _navigateToWeekOffset(0),
         child: Icon(
           Icons.home_rounded,
           color: Colors.white,

@@ -5,3 +5,7 @@ class InvalidCredentialsException implements Exception {
 class InvalidSessionException implements Exception {
   String toString() => "InvalidSessionException";
 }
+
+class InvalidWeekException implements Exception {
+  String toString() => "InvalidWeekException";
+}

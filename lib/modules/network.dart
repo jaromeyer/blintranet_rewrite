@@ -11,6 +11,7 @@ class NetworkManager {
   String _cookie;
   String _studentId;
   String _school;
+  bool _loggedIn = false;
 
   Future<void> login() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -34,6 +35,7 @@ class NetworkManager {
 
     // check if login was successful
     if (loginResponse.statusCode == 302) {
+      _loggedIn = true;
       final String rawCookie = loginResponse.headers['set-cookie'];
       _cookie = RegExp(r'sturmsession.*?;').firstMatch(rawCookie).group(0);
       _studentId = await _getStudentId(await _getCsrfToken());
@@ -68,6 +70,7 @@ class NetworkManager {
   }
 
   Future<Week> getWeek(int weekOffset) async {
+    if (!_loggedIn) await login();
     DateTime startDate = Date.startDate(weekOffset);
     DateTime endDate = startDate.add(Duration(days: 4));
 
@@ -85,7 +88,8 @@ class NetworkManager {
       Map<String, dynamic> decodedJson = json.decode(timetableResponse.body);
       return Week.fromJson(decodedJson);
     } else if (timetableResponse.statusCode == 302) {
-      throw InvalidSessionException();
+      await login();
+      return getWeek(weekOffset);
     }
   }
 }

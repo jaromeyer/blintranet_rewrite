@@ -24,9 +24,8 @@ dependencies:
   flutter:
     sdk: flutter
   http: ^0.12.2
-  shared_preferences: ^0.5.12+2
+  shared_preferences: ^0.5.12+4
   intl: ^0.16.1
-  marquee: ^1.1.1
   auto_size_text: ^2.1.0
   webview_flutter: ^1.0.7
 
