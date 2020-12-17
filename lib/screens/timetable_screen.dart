@@ -1,10 +1,12 @@
 import 'dart:io';
 
+import 'package:blintranet/constants/custom_colors.dart';
 import 'package:blintranet/models/exceptions.dart';
 import 'package:blintranet/models/week.dart';
 import 'package:blintranet/modules/date.dart';
 import 'package:blintranet/modules/network.dart';
 import 'package:blintranet/widgets/timetable_widget.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class TimetableScreen extends StatefulWidget {
@@ -68,7 +70,7 @@ class _TimetableScreenState extends State<TimetableScreen> {
         _loggedIn = true;
       }
       Week week = await _networkManager.getWeek(weekOffset);
-      return TimetableWidget(week: week);
+      return TimetableWidget(week);
     } on InvalidCredentialsException {
       Navigator.pushReplacementNamed(context, '/login');
     } on InvalidSessionException {
@@ -82,11 +84,12 @@ class _TimetableScreenState extends State<TimetableScreen> {
       await showDialog(
         context: context,
         builder: (_) {
-          return AlertDialog(
+          return CupertinoAlertDialog(
             title: Text("Kei Internet Verbindig"),
             content: Text("Glaub meh musi nöd sege..."),
             actions: <Widget>[
-              FlatButton(
+              CupertinoDialogAction(
+                isDefaultAction: true,
                 child: Text("OK"),
                 onPressed: () {
                   Navigator.pop(context);
@@ -103,7 +106,7 @@ class _TimetableScreenState extends State<TimetableScreen> {
         context: context,
         builder: (_) {
           return AlertDialog(
-            title: Text("Kei ahnig was grad passiert isch"),
+            title: Text("Kei ahnig was grad passiert isch😕"),
             content: Text(e.toString()),
             actions: <Widget>[
               FlatButton(
@@ -127,35 +130,31 @@ class _TimetableScreenState extends State<TimetableScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        elevation: 0.0,
+        centerTitle: false,
         title: Text(_title),
         actions: [
-          IconButton(
-            icon: Icon(Icons.mail),
-            onPressed: () {
-              Navigator.pushNamed(context, '/mail');
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.home),
-            onPressed: () {
-              _pageController.animateToPage(
-                100,
-                duration: const Duration(milliseconds: 400),
-                curve: Curves.easeInOut,
-              );
-            },
+          TextButton(
+            child: Text(
+              "Mail",
+              style: TextStyle(color: CustomColors.red),
+            ),
+            onPressed: () => Navigator.pushNamed(context, '/mail'),
           ),
         ],
       ),
       body: _pageView,
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.refresh),
         onPressed: () {
-          setState(() {
-            _buildPageView();
-          });
+          _pageController.animateToPage(
+            100,
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.easeInOut,
+          );
         },
+        child: Icon(
+          Icons.home_rounded,
+          color: Colors.white,
+        ),
       ),
     );
   }

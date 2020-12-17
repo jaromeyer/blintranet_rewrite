@@ -24,4 +24,15 @@ class Strings {
     'krr': "Realgymnasium Rämibühl",
     'slk': "Schulleiterkonferenz",
   };
+
+  static Map<String, String> headers(String cookie) {
+    return {
+      'User-Agent':
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:77.0) Gecko/20100101 Firefox/77.0',
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'X-Requested-With': 'XMLHttpRequest',
+      'Referer': 'https://intranet.tam.ch/kfr/calendar',
+      'Cookie': cookie
+    };
+  }
 }

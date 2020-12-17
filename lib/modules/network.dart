@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:blintranet/constants/headers.dart';
+import 'package:blintranet/constants/strings.dart';
 import 'package:blintranet/models/exceptions.dart';
 import 'package:blintranet/models/week.dart';
 import 'package:blintranet/modules/date.dart';
@@ -29,7 +29,7 @@ class NetworkManager {
         'loginpassword': password,
         'loginschool': _school,
       },
-      headers: Headers.loginHeaders,
+      headers: Strings.headers(null),
     );
 
     // check if login was successful
@@ -45,7 +45,7 @@ class NetworkManager {
   Future<String> _getCsrfToken() async {
     final csrfTokenResponse = await http.get(
       'https://intranet.tam.ch/$_school',
-      headers: Headers.timetableHeaders(_cookie),
+      headers: Strings.headers(_cookie),
     );
     String csrfToken = RegExp(r".*csrfToken='(.*?)'")
         .firstMatch(csrfTokenResponse.body)
@@ -60,7 +60,7 @@ class NetworkManager {
         'periodId': "72",
         'csrfToken': csrfToken,
       },
-      headers: Headers.resourcesHeaders(_cookie),
+      headers: Strings.headers(_cookie),
     );
     return json
         .decode(studentIdResponse.body)['data']['students'][0]['personId']
@@ -78,7 +78,7 @@ class NetworkManager {
         'endDate': endDate.millisecondsSinceEpoch.toString(),
         'studentId[]': _studentId,
       },
-      headers: Headers.timetableHeaders(_cookie),
+      headers: Strings.headers(_cookie),
     );
 
     if (timetableResponse.statusCode == 200) {
