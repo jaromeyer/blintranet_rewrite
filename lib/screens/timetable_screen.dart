@@ -4,6 +4,7 @@ import 'package:blintranet/constants/custom_colors.dart';
 import 'package:blintranet/models/exceptions.dart';
 import 'package:blintranet/models/week.dart';
 import 'package:blintranet/modules/date.dart';
+import 'package:blintranet/modules/dialog.dart';
 import 'package:blintranet/modules/network.dart';
 import 'package:blintranet/widgets/timetable_widget.dart';
 import 'package:flutter/cupertino.dart';
@@ -23,8 +24,7 @@ class _TimetableScreenState extends State<TimetableScreen> {
   @override
   void initState() {
     super.initState();
-    _pageController =
-        new PageController(initialPage: 100, viewportFraction: 0.999);
+    _pageController = new PageController(initialPage: 100);
     _pageView = _buildPageView();
     _networkManager = new NetworkManager();
   }
@@ -67,44 +67,24 @@ class _TimetableScreenState extends State<TimetableScreen> {
       Navigator.pushReplacementNamed(context, '/login');
     } on InvalidWeekException {
       // show error message and navigate back to valid week after user confirmation
-      await _showErrorDialog(
+      await DialogHelper.showErrorDialog(
+          context,
           "Da gits nüt meh zgseh🚫",
           "Stundeplän fürs nöchschte Semester sind leider nonig verfüegbar",
           "Ok");
       _navigateToWeekOffset(weekOffset - 1);
     } on IOException {
       // show error message and retry after user confirmation
-      await _showErrorDialog(
-          "Kei Internet📶", "Meh musi glaubs nöd sege", "Retry");
+      await DialogHelper.showNoInternetDialog(context);
+      Navigator.popUntil(context, ModalRoute.withName('/'));
       return _buildTable(weekOffset);
     } catch (e) {
-      // print and show stacktrace and retry after user interaction
-      await _showErrorDialog(
-          "Woops... Kei ahnig was grad passiert isch🙈", e, "Retry");
+      // show error and retry after user interaction
+      await DialogHelper.showErrorDialog(context,
+          "Woops... Kei ahnig was grad passiert isch🙈", e.toString(), "Retry");
+      Navigator.popUntil(context, ModalRoute.withName('/'));
       return _buildTable(weekOffset);
     }
-  }
-
-  Future<void> _showErrorDialog(
-      String title, String message, String button) async {
-    await showDialog(
-      context: context,
-      builder: (_) {
-        return CupertinoAlertDialog(
-          title: Text(title),
-          content: Text(message),
-          actions: <Widget>[
-            CupertinoDialogAction(
-              isDefaultAction: true,
-              child: Text(button),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        );
-      },
-    );
   }
 
   void _navigateToWeekOffset(int weekOffset) {
