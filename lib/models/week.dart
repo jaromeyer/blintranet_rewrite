@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import 'package:blintranet/constants/lesson_types.dart';
 import 'package:intl/intl.dart';
 
 import 'day.dart';
@@ -20,6 +21,8 @@ class Week {
     if (json['status'] == 0) throw new InvalidWeekException();
     // iterate over lessons
     for (Map<String, dynamic> jsonLesson in json['data']) {
+      if (jsonLesson['timetableEntryTypeId'] == LessonTypes.roomReservation)
+        continue;
       // add lesson time
       String time = jsonLesson['lessonStart'].substring(0, 5);
       lessonTimes.add(time);

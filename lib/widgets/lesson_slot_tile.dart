@@ -18,8 +18,8 @@ class LessonSlotTile extends StatelessWidget {
           break;
         case LessonTypes.shifted:
         case LessonTypes.added:
+        case LessonTypes.roomChange:
         case LessonTypes.blockSubstitution:
-        case LessonTypes.roomReservation:
           return CustomColors.blue;
       }
     }
